@@ -1,0 +1,22 @@
+---
+- name: Install deimos
+  pip: name=deimos
+  when: mesos_version | version_compare('0.20.0', '<')
+
+- name: Deimos default config file
+  template: src=deimos.conf.j2 dest=/etc/deimos.cfg
+  when: mesos_version | version_compare('0.20.0', '<')
+
+# This task is not able to remove already existing config files
+- name: Set mesos slave options
+  template: src=etc.mesos.j2 dest=/etc/mesos-slave/{{item.key}}
+  with_dict: mesos_options_slave | default({}) # with_dict needs explicit default
+  notify: Restart mesos-slave
+
+- name: Set mesos slave hostname to its IP
+  template: src=etc.mesos.j2 dest=/etc/mesos-slave/{{item.key}}
+  with_dict:
+    hostname: "{{inventory_hostname}}"
+
+- name: Start mesos-slave
+  service: name=mesos-slave state=started enabled=yes sleep=5

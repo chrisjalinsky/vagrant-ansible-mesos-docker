@@ -1,0 +1,6 @@
+---
+- include: regular.yml
+  when: installation_type != 'machine'
+
+- include: machine.yml
+  when: installation_type == 'machine'

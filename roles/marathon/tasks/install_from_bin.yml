@@ -1,0 +1,12 @@
+---
+- file: path=/opt/src state=directory recurse=yes
+
+- name: Download marathon tarball
+  get_url: url={{marathon_download_url}} dest=/opt/src/{{marathon_file_name}}
+
+- name: Make sure bin folder exists
+  file: state=directory path={{marathon_bin_folder}}
+
+- name: Unpack marathon tarball.
+  command: tar zxf /opt/src/{{marathon_file_name}} --strip-components=1 -C {{marathon_bin_folder}} chdir=/tmp creates={{marathon_bin_folder}}/bin
+  notify: Restart marathon

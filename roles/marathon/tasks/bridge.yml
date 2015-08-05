@@ -1,0 +1,17 @@
+---
+- name: Add Stickiness
+  template: src=patched_haproxy_bridge.j2 dest={{marathon_bin_folder}}/bin/haproxy-marathon-bridge
+
+- name: Check whether bridge script has changed
+  command: diff {{marathon_bin_folder}}/bin/haproxy-marathon-bridge /usr/local/bin/haproxy-marathon-bridge
+  register: marathon_bridge_script_diff
+  changed_when: False
+  ignore_errors: True
+  always_run: True
+
+- name: Run haproxy bridge install script
+  command: "{{marathon_bin_folder}}/bin/haproxy-marathon-bridge install_haproxy_system"
+  when: marathon_bridge_script_diff.stdout != "" or marathon_bridge_script_diff.stderr != ""
+
+- name: Re-Configure marathon hosts
+  template: src=marathons.j2 dest=/etc/haproxy-marathon-bridge/marathons

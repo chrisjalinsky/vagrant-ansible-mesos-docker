@@ -1,0 +1,3 @@
+---
+mesos_ip: "{{ansible_eth1.ipv4.address}}"
+marathon_ip: "{{mesos_ip}}"

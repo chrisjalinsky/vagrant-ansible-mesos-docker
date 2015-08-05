@@ -1,0 +1,10 @@
+---
+
+- name: Restart mesos-master
+  service: name=mesos-master state=restarted enabled=yes sleep=5
+
+- name: Restart mesos-slave
+  service: name=mesos-slave state=restarted enabled=yes sleep=5
+
+- name: Restart mesos
+  service: name=mesos-{{mesos_mode}} state=restarted enabled=yes sleep=5

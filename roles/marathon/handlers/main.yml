@@ -1,0 +1,5 @@
+---
+
+- name: Restart marathon
+  service: name=marathon state=restarted enabled=yes sleep=5
+  when: marathon_run_mode == "server"

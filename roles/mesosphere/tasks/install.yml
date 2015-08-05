@@ -1,0 +1,41 @@
+---
+- name: Apt install required system packages.
+  apt: pkg={{item}} state=installed
+  with_items:
+    - openjdk-7-jre-headless
+    - libsvn1
+
+- file: path=/opt/src state=directory recurse=yes
+
+- name: Download mesos
+  get_url: url={{mesos_download_url}} dest=/opt/src/{{mesos_file_name}}
+
+- name: Check installed mesos version
+  shell: mesos-master --version | cut -c 7-
+  register: mesos_installed_version
+  changed_when: False
+  ignore_errors: True
+  always_run: True
+
+- name: Install Mesos Debian Package
+  shell: dpkg -i /opt/src/{{mesos_file_name}}
+  notify: Restart mesos
+  when: mesos_version != mesos_installed_version.stdout
+
+- name: Download mesos python bindings (egg file)
+  get_url: url={{mesos_python_download_url}} dest=/opt/src/{{mesos_python_file_name}}
+
+- name: Install Mesos python bindings
+  shell: easy_install /opt/src/{{mesos_python_file_name}}
+  notify: Restart mesos
+  when: mesos_version != mesos_installed_version.stdout
+
+- name: Mesos default config file
+  template: src=mesos.j2 dest=/etc/default/mesos
+  notify: Restart mesos
+
+- name: Set mesos zookeeper config
+  template: src=etc.mesos.j2 dest=/etc/mesos/zk
+  with_dict:
+    zk: "{{mesos_zk}}"
+  notify: Restart mesos

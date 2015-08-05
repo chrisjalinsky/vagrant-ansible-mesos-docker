@@ -1,0 +1,12 @@
+---
+- include: install.yml
+
+- include: deploy.yml
+# - name: Apt install zookeeper packages.
+#   apt: pkg={{item}} state=installed
+#   with_items:
+#     - zookeeperd
+
+# - template: src=myid dest=/var/lib/zookeeper/myid
+#   notify:
+#     - restart zookeeper

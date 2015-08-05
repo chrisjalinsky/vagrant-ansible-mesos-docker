@@ -1,0 +1,10 @@
+description "marathon"
+
+start on runlevel [2345]
+respawn
+
+env LIBPROCESS_IP={{marathon_ip}}
+
+script
+  exec {{marathon_bin_folder}}/bin/start --master {{mesos_masters}} --zk {{marathon_zk}} --hostname {{inventory_hostname}} --event_subscriber http_callback --task_launch_timeout {{marathon_launch_timeout}} {{marathon_runtime_params}} >> {{marathon_log_file}} 2>&1
+end script

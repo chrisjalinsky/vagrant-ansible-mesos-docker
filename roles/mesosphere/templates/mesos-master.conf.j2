@@ -1,0 +1,10 @@
+description "mesos master"
+
+start on stopped rc RUNLEVEL=[2345]
+respawn
+
+pre-start script
+  mkdir -p `cat /etc/mesos-master/work_dir`
+end script
+
+exec /usr/bin/mesos-init-wrapper master

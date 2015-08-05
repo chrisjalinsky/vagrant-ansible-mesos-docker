@@ -1,0 +1,49 @@
+---
+- hosts: all
+  sudo: yes
+
+  tasks:
+    - name: Set global cluster variable facts
+      set_fact:
+        zk_endpoint: "zk://{{ groups['mesos-masters'] | join(':2181,') }}:2181"
+
+    - name: Set global mesos variable facts
+      set_fact:
+        mesos_zk: "{{ zk_endpoint }}/mesos"
+
+    - name: Set global marathon variable facts
+      set_fact:
+        marathon_host_servers: "{{ groups['mesos-masters'] }}"
+        marathon_zk: "{{ zk_endpoint }}/marathon"
+
+  roles:
+    - common
+
+# Mesos masters
+- hosts: mesos-masters
+  gather_facts: false
+  sudo: yes
+
+  vars:
+    - zookeeper_servers: "{{ groups['mesos-masters'] }}"
+    - mesos_quorum: "{{ ((groups['mesos-masters'] | length) / 2) | round(0, 'ceil') | int }}"
+
+  roles:
+    - { role: zookeeper, tags: [ 'zookeeper' ] }
+    - { role: mesosphere, tags: [ 'mesos' ], mesos_mode: master }
+    - { role: marathon, tags: [ 'marathon'] }
+
+# Mesos slaves
+- hosts: mesos-slaves
+  gather_facts: false
+  sudo: yes
+
+  vars:
+    - mesos_options_slave:
+        containerizers: "docker,mesos"
+        executor_registration_timeout: 5mins
+
+  roles:
+    - { role: mesosphere, tags: [ 'mesos' ], mesos_mode: slave }
+    - { role: marathon, tags: [ 'marathon'], marathon_run_mode: bridge }
+    - { role: docker, tags: [ 'docker' ], docker_version: lxc-docker-1.6.0, installation_type: "regular" }

@@ -1,0 +1,17 @@
+---
+- name: Get Docker release tool key
+  apt_key: url="https://get.docker.io/gpg" state=present
+
+- name: Add Docker deb repository
+  apt_repository:
+    repo: "deb https://get.docker.io/ubuntu docker main"
+    state: "present"
+    update_cache: yes
+
+- name: Install Docker
+  apt:
+    name: "{{ docker_version | default('lxc-docker') }}"
+    state: "present"
+
+- name: Install Docker module
+  pip: name=docker-py version=1.1.0

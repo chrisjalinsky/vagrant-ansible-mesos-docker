@@ -1,0 +1,16 @@
+---
+marathon_install_mode: "bin" # 'bin' or 'source'
+marathon_run_mode: "server" # 'server' or 'bridge'
+
+marathon_version: "0.8.0"
+marathon_file_name:  "marathon-{{marathon_version}}.tgz"
+marathon_download_url: "http://downloads.mesosphere.io/marathon/v{{marathon_version}}/{{marathon_file_name}}"
+
+marathon_bin_folder: "/opt/marathon/{{marathon_version}}"
+
+marathon_ip: "{{ansible_eth0.ipv4.address}}"
+marathon_port: 8080
+marathon_log_file: "/var/log/marathon.log"
+marathon_zk: "zk://localhost:2181/marathon"
+marathon_launch_timeout: 600000 # should be set to a time interval greater than mesos_options_slave.executor_registration_timeout
+marathon_runtime_params: ""

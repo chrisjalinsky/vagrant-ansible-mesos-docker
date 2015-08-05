@@ -1,0 +1,34 @@
+---
+- file: path=/opt/src state=directory recurse=yes
+
+- name: Apt install required system packages.
+  apt: pkg={{item}} state=installed
+  with_items:
+   - openjdk-7-jdk
+   - git
+
+- name: Download the sbt build tool
+  get_url: url=http://dl.bintray.com/sbt/debian/sbt-0.13.5.deb dest=/opt/src/sbt-0.13.5.deb
+
+- name: Install sbt
+  apt: deb=/opt/src/sbt-0.13.5.deb
+
+- name: Make sure bin folder exists
+  file: state=directory path={{marathon_bin_folder}}
+
+- name: Clone Marathon github repository
+  git: repo=https://github.com/mesosphere/marathon.git
+       dest={{marathon_bin_folder}}
+       version={{marathon_version}}
+
+- name: Check wheter a jar is already built in the current src folder
+  command: find {{marathon_bin_folder}}/target -name 'marathon-assembly-*.jar'
+  register: marathon_src_jars
+  changed_when: False
+
+- name: Build Marathon
+  command: sbt assembly
+  args:
+    chdir: "{{marathon_bin_folder}}"
+  when: marathon_src_jars.stdout == ""
+  notify: Restart marathon

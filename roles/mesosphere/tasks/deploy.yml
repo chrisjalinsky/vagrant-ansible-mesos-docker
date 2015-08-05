@@ -1,0 +1,14 @@
+---
+- include: mesos-master.yml
+  when: mesos_mode is defined and mesos_mode == "master"
+
+- include: mesos-slave.yml
+  when: mesos_mode is defined and mesos_mode == "slave"
+
+- name: Stop mesos-master when node is not set as master
+  service: name=mesos-master state=stopped enabled=no sleep=5
+  when: mesos_mode is not defined or mesos_mode != "master"
+
+- name: Stop mesos-slave when node is not set as slave
+  service: name=mesos-slave state=stopped enabled=no sleep=5
+  when: mesos_mode is not defined or mesos_mode != "slave"
