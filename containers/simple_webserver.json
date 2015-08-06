@@ -1,5 +1,5 @@
 {
-  "id": "simple_webserver",
+  "id": "simplewebserver",
   "cpus": 0.5,
   "mem": 64.0,
   "instances": 2,
