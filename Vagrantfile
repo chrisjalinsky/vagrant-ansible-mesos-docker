@@ -28,9 +28,10 @@ ansible_provision = proc do |ansible|
   # these aren't supported by Vagrant, see
   # https://github.com/mitchellh/vagrant/issues/3539
   #  ansible.groups = {
-  #    'mesos-masters'  => (1..NUM_SLAVES).map { |i| CLUSTER["mesos-master#{i}"][:ip] },
-  #    'mesos-slaves' => (1..NUM_SLAVES).map { |i| CLUSTER["mesos-slave#{i}"][:ip] },
-  #    'local' => ["localhost"]
+  #    "local" => ["localhost"],
+  #    "mesos-masters"  => (1..NUM_SLAVES).map { |i| CLUSTER["mesos-master#{i}"][:ip] },
+  #    "mesos-slaves" => (1..NUM_SLAVES).map { |i| CLUSTER["mesos-slave#{i}"][:ip] },
+  #    "vagrant:children" => ["mesos-masters","mesos-slaves"]
   #  }
   ansible.verbose = "v"
   ansible.inventory_path = base_dir + "/inventory/vagrant"
